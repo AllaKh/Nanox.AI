@@ -41,40 +41,55 @@ To generate test reports:
 mvn verify
 ```
 
-## Test Scenarios
+## Define Test Scenarios
 
-We have defined the following test scenarios:
+For this application, test scenarios should cover the most important features that the application provides, ensuring they function as expected.
 
-1. **User Registration**
+1. **Login Test Scenario:**
 
-   - Verify that a user can successfully register with valid credentials.
-   - Verify negative scenario: user cannot register with nonvalid credentials including field validation
-   - **Reason:** Critical for user engagement and account creation.
+   **Description:** Test the login functionality with valid and invalid credentials.
+   **Reason:** Login is typically one of the most critical features. It needs to be tested for both valid and invalid user inputs to ensure the system correctly handles login attempts.
+   **Steps:**
+   1. Enter valid username and password.
+   2. Click the login button.
+   3. Verify the login is successful and the user is redirected to the homepage.
+   4. Repeat for invalid credentials and check for appropriate error message.
 
-2. **User Login**
+2. **Form Submission Test Scenario:**
 
-   - Verify that a registered user can log in successfully.
-   - Verify negative scenario: user cannot log if wrong credentials were entered
-   - Verify field validation
-   - **Reason:** Ensures authentication functionality works.
+   **Description:** Test form submission with valid and invalid data.
+   **Reason:** Forms are common in applications and often involve a series of validations, so testing form submission and input validation is vital.
+   **Steps:**
+   1. Enter valid data in the form fields.
+   2. Submit the form.
+   3. Verify that the form is submitted successfully and an appropriate confirmation message appears.
+   4. Test with invalid input data and verify that the system correctly handles the errors.
 
-3. **Adding a Product to Cart**
+3. **Search Functionality Test Scenario:**
 
-   - Verify that a user can add a product to the cart and see it listed.
-   - Verify that a user can delete a product from cart and see it not listed any more.
-   - **Reason:** Core functionality for e-commerce.
+   **Description:** Test the search functionality with different queries.
+   **Reason:** Search is often a core feature in many applications, so ensuring it works as expected is crucial.
+   **Steps:**
+   1. Enter a search term.
+   2. Verify that the results match the search term and that the UI displays the correct results.
+   3. Test with an empty or invalid search term and verify that the system behaves correctly (e.g., showing no results or a message like "No results found").
 
+4. **Navigation Test Scenario**
 
-4. **Completing a Purchase**
+   **Description:** Test that all important navigation links work.
+   **Reason:** Navigation is vital for usability, and ensuring that users can navigate between pages and sections is a must.
+   **Steps:**
+   1. Click on each navigation link in the header/footer.
+   2. Verify that the page redirects to the correct URL and content.
 
-   - Verify that a user can complete a purchase after adding items to the cart.
-   - Verify that a user can cancel a purchase before it was completed.
-   - **Reason:** Ensures checkout and payment flow work correctly.
+5. **Logout Test Scenario:**
 
-5. **Logout Functionality**
-
-   - Verify that a logged-in user can successfully log out.
-   - **Reason:** Security and session management validation.
+   **Description:** Test the logout functionality.
+   **Reason:** After login, users should be able to log out. This feature should work without any issues.
+   **Steps:**
+   1. Log in with valid credentials.
+   2. Click the logout button.
+   3. Verify that the user is logged out and redirected to the login page.
 
 ## Bug Reports
 
