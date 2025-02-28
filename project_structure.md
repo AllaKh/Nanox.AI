@@ -14,11 +14,11 @@ demo-blaze-tests/
 
 │   │   ├── java/
 
-│   │   │   ├── stepdefinitions/ # Step Definitions for Cucumber
+│   │   │   ├── steps/           # Step Definitions for Cucumber
 
 │   │   │   ├── services/        # JAVA methods for steps execution and result assertion
 
-│   │   │   ├── tools/          # JAVA methods for table transformers
+│   │   │   ├── tools/           # JAVA methods for table transformers
 
 │   │   ├── resources 
 
