@@ -18,9 +18,11 @@ demo-blaze-tests/
 
 │   │   │   ├── services/        # JAVA methods for steps execution and result assertion
 
-│   │   │   ├── features/        # Gerkhin Cucumber .feature files
+│   │   │   ├── tools/          # JAVA methods for table transformers
 
 │   │   ├── resources 
+
+│   │   │   ├── features/        # Gerkhin Cucumber .feature files
 
 │   │   │   ├── test_files/      # json files with test data (e.g. usernames and passwords, payment credentials)
 
