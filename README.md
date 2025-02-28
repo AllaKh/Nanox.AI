@@ -19,8 +19,7 @@ Before running the tests, ensure you have the following installed:
 
 1. Clone the repository:
    ```sh
-   git clone <repository-url>
-   cd demo-blaze-tests
+   git clone git@github.com:AllaKh/Nanox.AI.git
    ```
 2. Install dependencies:
    ```sh
