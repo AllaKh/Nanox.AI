@@ -1,91 +1,89 @@
 # Nanox.AI
 
-Demo Blaze Automated Testing with Selenium & Cucumber
+# Demo Blaze Automated Testing with Selenium & Cucumber
 
-**Overview**
+## Overview
 
-This project implements automated UI tests for the Demo Blaze application using Selenium, Cucumber, and Java following the Page Object Model (POM) structure.
+This project implements automated UI tests for the Demo Blaze application using **Selenium**, **Cucumber**, and **Java** following the **Page Object Model (POM)** structure.
 
-**Prerequisites**
+## Prerequisites
 
 Before running the tests, ensure you have the following installed:
 
-Java JDK 11+
+- **Java JDK 11+**
+- **Maven**
+- **Git**
+- **Google Chrome** and **ChromeDriver** (ensure they are compatible versions)
 
-Maven
+## Installation
 
-Git
+1. Clone the repository:
+   ```sh
+   git clone <repository-url>
+   cd demo-blaze-tests
+   ```
+2. Install dependencies:
+   ```sh
+   mvn clean install
+   ```
 
-Google Chrome and ChromeDriver (ensure they are compatible versions)
-
-**Installation**
-
-Clone the repository:
-
-git clone <repository-url>
-cd demo-blaze-tests
-
-Install dependencies:
-
-mvn clean install
-
-**Running Tests**
+## Running Tests
 
 To execute tests, use the following command:
 
+```sh
 mvn test
+```
 
 To generate test reports:
 
+```sh
 mvn verify
+```
 
-**Test Scenarios**
+## Test Scenarios
 
-The following test scenarios must be definded:
+We have defined the following test scenarios:
 
-_User Registration_
+1. **User Registration**
 
-Verify that a user can successfully register with valid credentials.
-Verify negative scenario: user cannot register with nonvalid credentials including field validation
+   - Verify that a user can successfully register with valid credentials.
+   - Verify negative scenario: user cannot register with nonvalid credentials including field validation
+   - **Reason:** Critical for user engagement and account creation.
 
-Reason: Critical for user engagement and account creation.
+2. **User Login**
 
-_User Login_
+   - Verify that a registered user can log in successfully.
+   - Verify negative scenario: user cannot log if wrong credentials were entered
+   - Verify field validation
+   - **Reason:** Ensures authentication functionality works.
 
-Verify that a registered user can log in successfully.
-Verify negative scenario: user cannot log if wrong credentials were entered
-Verify field validation
+3. **Adding a Product to Cart**
 
-Reason: Ensures authentication functionality works.
+   - Verify that a user can add a product to the cart and see it listed.
+   - Verify that a user can delete a product from cart and see it not listed any more.
+   - **Reason:** Core functionality for e-commerce.
 
-_Adding a Product to Cart_
 
-Verify that a user can add a product to the cart and see it listed.
-Verify that a user can delete a product from cart and see it not listed any more.
+4. **Completing a Purchase**
 
-Reason: Core functionality for e-commerce.
+   - Verify that a user can complete a purchase after adding items to the cart.
+   - Verify that a user can cancel a purchase before it was completed.
+   - **Reason:** Ensures checkout and payment flow work correctly.
 
-_Completing a Purchase_
+5. **Logout Functionality**
 
-Verify that a user can complete a purchase after adding items to the cart.
-Verify that a user can cancel a purchase before it was completed.
+   - Verify that a logged-in user can successfully log out.
+   - **Reason:** Security and session management validation.
 
-Reason: Ensures checkout and payment flow work correctly.
+## Bug Reports
 
-_Logout Functionality_
+If any issues are found, a detailed bug report will be included in the `bug_report.md` file.
 
-Verify that a logged-in user can successfully log out.
+## Suggestions for Improvement
 
-Reason: Security and session management validation.
+A document (`improvement_suggestions.md`) is included with potential application enhancements in terms of UX, performance, and stability.
 
-**Bug Reports**
-
-If any issues are found, a detailed bug report will be included in the bug_report.md file.
-
-**Suggestions for Improvement**
-
-A document (improvement_suggestions.md) is included with potential application enhancements in terms of UX, performance, and stability.
-
-3-Month Automation Strategy Plan (Optional)
+## 3-Month Automation Strategy Plan (Optional)
 
 A roadmap for long-term test automation is provided in automation_strategy.md.
