@@ -11,7 +11,7 @@ Feature: Login functionality
     Given User is on the login page
     When User enters invalid credentials:
       | <username> | <password> |
-    Then I should see an error message
+    Then User should see an error message
 
     Examples:
       | username      | password |

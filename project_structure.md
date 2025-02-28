@@ -6,9 +6,7 @@ demo-blaze-tests/
 
 │   │   ├── java/
 
-│   │   │   ├── pages/          # Page Object Model classes
-
-│   │   │   ├── utils/          # Utility classes (WebDriver, etc.)
+│   │   │   ├── webapp/         # web.xml
 
 │   ├── test/
 
@@ -18,18 +16,23 @@ demo-blaze-tests/
 
 │   │   │   ├── services/        # JAVA methods for steps execution and result assertion
 
-│   │   │   ├── tools/           # JAVA methods for table transformers
 
 │   │   ├── resources 
 
-│   │   │   ├── features/        # Gerkhin Cucumber .feature files
+│   │   │   ├── features/        # Gherkin Cucumber .feature files
 
-│   │   │   ├── test_files/      # json files with test data (e.g. usernames and passwords, payment credentials)
+│   │   │   ├── test_files/      # json files with data
 
 │   │   │   ├── test.yml         # yml configuration files
 
-│   │   │   ├── logback-test.xml # log definitions
+│   │── README.md
+
+│   │──automation_strategy.md
+
+│   │──TestDefinitions.md
+
+│   │──BugReport.md
+
+│   │──Suggestions.md
 
 │── pom.xml                      # Maven dependencies
-
-│── README.md

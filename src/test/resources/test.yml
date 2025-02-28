@@ -1,0 +1,27 @@
+version: "3.8"
+services:
+  cucumber-tests:
+    image: maven:3.6.3-jdk-8  # Using Maven and JDK 8
+    container_name: cucumber_tests
+    working_dir: /usr/src/app
+    volumes:
+      - .:/usr/src/app  # Mount current directory to the container
+    command: mvn clean test  # Tests execution via Maven
+    environment:
+      - MAVEN_OPTS=-Xmx1024m  # Memory settings for Maven
+    networks:
+      - test-network
+    depends_on:
+      - selenium-server
+
+  selenium-server:
+    image: selenium/standalone-chrome:latest  # Using Selenium with Chrome
+    container_name: selenium-server
+    ports:
+      - "4444:4444"  # Port for Selenium WebDriver
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge
