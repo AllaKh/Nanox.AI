@@ -1,12 +1,12 @@
 Feature: Login functionality
 
-  @TC1
+  @TC1 @Login
   Scenario: Successful login with valid credentials
     Given User is on the login page
     When User enters valid username "testuser" and password "Abc123"
     Then User should be redirected to the homepage
 
-  @TC2
+  @TC2 @Login @Negative
   Scenario Outline: Unsuccessful login with invalid credentials - <username> and <password>
     Given User is on the login page
     When User enters invalid credentials:
