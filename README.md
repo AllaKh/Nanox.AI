@@ -50,6 +50,6 @@ If any issues are found, a detailed bug report will be included in the `bug_repo
 
 A document (`improvement_suggestions.md`) is included with potential application enhancements in terms of UX, performance, and stability.
 
-## 3-Month Automation Strategy Plan (Optional)
+## 3-Month Automation Strategy Plan
 
 A roadmap for long-term test automation is provided in automation_strategy.md.
