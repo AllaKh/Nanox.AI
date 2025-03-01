@@ -2,6 +2,7 @@ Feature: Login functionality
 
   @TC1 @Login
   Scenario: Successful login with valid credentials
+
     Given User is on the login page
     When User enters valid username "testuser" and password "Abc123"
     Then User should be redirected to the homepage

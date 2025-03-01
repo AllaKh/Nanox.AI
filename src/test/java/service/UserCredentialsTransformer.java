@@ -6,11 +6,16 @@ import java.util.Map;
 public class UserCredentialsTransformer {
 
     @DataTableType
-    public UserCredentials transform(Map<String, String> row) {
+    public UserCredentials transformEntry(Map<String, String> row) {
         return new UserCredentials(
-                row.getOrDefault("name", Constants.DEFAULT_USER_NAME),
-                row.getOrDefault("email", Constants.DEFAULT_MAIL),
-                row.getOrDefault("message", Constants.DEFAULT_MESSAGE)
+                replaceBlankWithEmpty(row.getOrDefault("username", Constants.USER_NAME)),
+                replaceBlankWithEmpty(row.getOrDefault("password", Constants.USER_PASSWORD)),
+                replaceBlankWithEmpty(row.getOrDefault("email", Constants.USER_EMAIL)),
+                replaceBlankWithEmpty(row.getOrDefault("message", Constants.USER_MESSAGE))
         );
+    }
+
+    private String replaceBlankWithEmpty(String value) {
+        return "[blank]".equals(value) ? "" : value;
     }
 }

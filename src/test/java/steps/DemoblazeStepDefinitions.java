@@ -1,15 +1,22 @@
 package steps;
 
 import io.cucumber.datatable.DataTable;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.Assert;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import junit.framework.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import service.Constants;
 import service.DemoblazeTestService;
+import service.UserCredentials;
 
 import java.util.List;
 import java.util.Map;
@@ -64,6 +71,7 @@ public class DemoblazeStepDefinitions {
 
     @Then("User should see an error message")
     public void iShouldSeeAnErrorMessage() {
+        Assert Assert;
         try {
             WebElement alert = driver.findElement(By.id("logInModal")); // Checking if modal still exists
             Assert.assertTrue(alert.isDisplayed());
@@ -85,24 +93,26 @@ public class DemoblazeStepDefinitions {
     }
 
     // ✅ Successful Form Submission
-    @When("user enters valid data in the form fields")
+    @When("user enters valid data in the form fields:")
     public void userEntersValidData() {
-        UserCredentials user = new UserCredentials(Constants.DEFAULT_USER_NAME, Constants.DEFAULT_MAIL, Constants.DEFAULT_MESSAGE);
-        formService.fillContactForm(user);
+        UserCredentials userData = new UserCredentials(Constants.USER_NAME, Constants.USER_PASSWORD, Constants.USER_EMAIL, Constants.USER_MESSAGE);
+        formService.fillContactForm(userData);
     }
 
     // ❌ Unsuccessful Form Submission (using data table for different invalid inputs)
-    @When("user enters invalid data in the form fields")
+    @When("user enters invalid data in the form fields:")
     public void userEntersInvalidData(DataTable dataTable) {
         List<Map<String, String>> credentialsList = dataTable.asMaps(String.class, String.class);
 
         for (Map<String, String> row : credentialsList) {
+            // Initialize UserCredentials from the data table
             UserCredentials user = new UserCredentials(
                     row.getOrDefault("name", ""),
+                    row.getOrDefault("password", ""),
                     row.getOrDefault("email", ""),
                     row.getOrDefault("message", "")
             );
-            formService.fillContactForm(user);
+            formService.fillContactForm(user); // Pass the user object to the formService
         }
     }
 
@@ -172,11 +182,11 @@ public class DemoblazeStepDefinitions {
 
     @Then("The correct pages should load with the expected URLs")
     public void theCorrectPagesShouldLoadWithTheExpectedURLs() {
+        // Explicitly declare the Map with String keys and String values
         Map<String, String> failedUrls = searchAndNavigateService.verifyNavigation();
         Assert.assertTrue("Some pages did not load correctly: " + failedUrls, failedUrls.isEmpty());
         driver.quit();
     }
-
     @When("User clicks the logout button")
     public void userClicksTheLogoutButton() {
         demoblazeTestService.clickLogoutButton();

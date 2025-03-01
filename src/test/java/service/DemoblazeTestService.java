@@ -6,6 +6,7 @@ import org.openqa.selenium.WebElement;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.util.Map;
 
 public class DemoblazeTestService {
 
@@ -13,21 +14,31 @@ public class DemoblazeTestService {
 
     public DemoblazeTestService(WebDriver driver) {
         this.driver = driver;
+        expectedFooterLinks = Map.of(
+                "Privacy Policy", "https://www.demoblaze.com/privacy.html",
+                "Terms & Conditions", "https://www.demoblaze.com/terms.html"
+        );
     }
 
     private final String homePageUrl = "https://www.demoblaze.com/index.html";
     private final String loginPageUrl = "https://www.demoblaze.com/login.html";
     private final String contactPageUrl = "https://www.demoblaze.com/contact.html";
 
-    public static String getPayload(String name, String email, String message) {
-        UserCredentials user = new UserCredentials(name, email, message);
+    public static String getPayload(String name, String password, String email, String message) throws JsonProcessingException {
+        UserCredentials user = new UserCredentials(name, password, email, message);
         ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.writeValueAsString(user);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            return "{}"; // Return empty JSON in case of failure
-        }
+
+        return objectMapper.writeValueAsString(user);
+    }
+
+    public static void createMessage(String[] args) {
+        String name = Constants.USER_NAME;
+        String email = Constants.USER_EMAIL;
+        String message = Constants.USER_MESSAGE;
+
+        service.DemoblazeTestService Utils;
+        String jsonPayload = Utils.getPayload(name, email, message);
+        System.out.println(jsonPayload);
     }
 
     public void openLoginPage() {
@@ -73,30 +84,26 @@ public class DemoblazeTestService {
         driver.findElement(By.linkText("Contact")).click();
     }
 
-    public void fillContactForm(String jsonPayload) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonNode = objectMapper.readTree(jsonPayload);
+    public void fillContactForm(UserCredentials jsonPayload) throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(jsonPayload);
 
-            String name = jsonNode.get("name").asText();
-            String email = jsonNode.get("email").asText();
-            String message = jsonNode.get("message").asText();
+        String name = jsonNode.get("name").asText();
+        String email = jsonNode.get("email").asText();
+        String message = jsonNode.get("message").asText();
 
-            WebElement nameField = driver.findElement(By.id("recipient-name"));
-            WebElement emailField = driver.findElement(By.id("recipient-email"));
-            WebElement messageField = driver.findElement(By.id("message-text"));
+        WebElement nameField = driver.findElement(By.id("recipient-name"));
+        WebElement emailField = driver.findElement(By.id("recipient-email"));
+        WebElement messageField = driver.findElement(By.id("message-text"));
 
-            nameField.clear();
-            emailField.clear();
-            messageField.clear();
+        nameField.clear();
+        emailField.clear();
+        messageField.clear();
 
-            nameField.sendKeys(name);
-            emailField.sendKeys(email);
-            messageField.sendKeys(message);
+        nameField.sendKeys(name);
+        emailField.sendKeys(email);
+        messageField.sendKeys(message);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void submitForm() {
@@ -112,7 +119,7 @@ public class DemoblazeTestService {
         }
     }
 
-    public boolean isErrorMessageDisplayed() {
+    public boolean isErrorMessageDisplayedOnPage() {
         try {
             WebElement alert = driver.findElement(By.xpath("//div[contains(text(), 'Please fill out')]"));
             return alert.isDisplayed();
@@ -163,10 +170,7 @@ public class DemoblazeTestService {
             "Sign Up", "https://www.demoblaze.com/signup.html"
     );
 
-    private final Map<String, String> expectedFooterLinks = Map.of(
-            "Privacy Policy", "https://www.demoblaze.com/privacy.html",
-            "Terms & Conditions", "https://www.demoblaze.com/terms.html"
-    );
+    private final Map<String, String> expectedFooterLinks;
 
     public void clickHeaderLinks() {
         clickLinksAndVerify(expectedHeaderLinks, By.cssSelector(".nav-item a"));  // Update locator if necessary
