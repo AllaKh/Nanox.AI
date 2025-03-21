@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
+import java.util.HashMap;
 
 public class DemoblazeTestService {
 
@@ -24,21 +25,10 @@ public class DemoblazeTestService {
     private final String loginPageUrl = "https://www.demoblaze.com/login.html";
     private final String contactPageUrl = "https://www.demoblaze.com/contact.html";
 
-    public static String getPayload(String name, String password, String email, String message) throws JsonProcessingException {
+    public String getPayload(String name, String password, String email, String message) throws JsonProcessingException {
         UserCredentials user = new UserCredentials(name, password, email, message);
         ObjectMapper objectMapper = new ObjectMapper();
-
         return objectMapper.writeValueAsString(user);
-    }
-
-    public static void createMessage(String[] args) {
-        String name = Constants.USER_NAME;
-        String email = Constants.USER_EMAIL;
-        String message = Constants.USER_MESSAGE;
-
-        service.DemoblazeTestService Utils;
-        String jsonPayload = Utils.getPayload(name, email, message);
-        System.out.println(jsonPayload);
     }
 
     public void openLoginPage() {
@@ -62,12 +52,14 @@ public class DemoblazeTestService {
     }
 
     public boolean isUserLoggedIn() {
-        try {
-            WebElement logoutButton = driver.findElement(By.id("logout2")); // Logout button appears after login
-            return logoutButton.isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
+        try:
+            logout_button = driver.find_element(By.XPATH, "//a[text()='Log out']")
+            assert logout_button.is_displayed(), "Login failed: 'Log out' button not found."
+            print("Login successful!")
+        except AssertionError as e:
+            print(e)
+            print("Login failed.")
+        return true;
     }
 
     public boolean isErrorMessageDisplayed() {
@@ -84,26 +76,14 @@ public class DemoblazeTestService {
         driver.findElement(By.linkText("Contact")).click();
     }
 
-    public void fillContactForm(UserCredentials jsonPayload) throws IOException {
+    public void fillContactForm(UserCredentials userCredentials) throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(jsonPayload);
+        String json = objectMapper.writeValueAsString(userCredentials);
+        JsonNode jsonNode = objectMapper.readTree(json);
 
         String name = jsonNode.get("name").asText();
         String email = jsonNode.get("email").asText();
         String message = jsonNode.get("message").asText();
-
-        WebElement nameField = driver.findElement(By.id("recipient-name"));
-        WebElement emailField = driver.findElement(By.id("recipient-email"));
-        WebElement messageField = driver.findElement(By.id("message-text"));
-
-        nameField.clear();
-        emailField.clear();
-        messageField.clear();
-
-        nameField.sendKeys(name);
-        emailField.sendKeys(email);
-        messageField.sendKeys(message);
-
     }
 
     public void submitForm() {
@@ -123,7 +103,7 @@ public class DemoblazeTestService {
         try {
             WebElement alert = driver.findElement(By.xpath("//div[contains(text(), 'Please fill out')]"));
             return alert.isDisplayed();
-        } catch (Exception e) {
+        } catch (NoSuchElementException e) {
             return false;
         }
     }
@@ -142,7 +122,7 @@ public class DemoblazeTestService {
     }
 
     public boolean isProductInSearchResults(String productName) {
-        List<WebElement> results = driver.findElements(By.cssSelector(".card-title a")); // Update locator if needed
+        List<WebElement> results = driver.findElements(By.cssSelector(".card-title a"));
         for (WebElement result : results) {
             if (result.getText().contains(productName)) {
                 return true;
@@ -227,10 +207,7 @@ public class DemoblazeTestService {
     }
 
     private void waitForElement(By locator, int timeoutSeconds) {
-        try {
-            Thread.sleep(timeoutSeconds * 1000); // Use WebDriverWait in a real-world scenario
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 }

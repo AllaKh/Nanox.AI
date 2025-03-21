@@ -36,17 +36,20 @@ public class DemoblazeStepDefinitions {
 
     @Given("User is on the login page")
     public void userIsOnTheLoginPage() {
-        if (driver == null) {
-            driver = new ChromeDriver();
-        }
+        try {
+            driver.get("https://www.demoblaze.com/index.html")
+            WebElement loginButton = driver.findElement(By.id("login2"));
+            loginButton.click();
+        } catch (Exception e) {
+            e.printStackTrace();
     }
 
     // ✅ Successful Login
     @When("User enters valid username {string} and password {string}")
     public void userEntersValidCredentials(String username, String password) {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        demoblazeTestService.enterCredentials(username, password);
-        demoblazeTestService.submitLogin();
+        WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(),'Log in')]")));
+        loginButton.click();
     }
 
     @Then("User should be redirected to the homepage")
@@ -74,7 +77,7 @@ public class DemoblazeStepDefinitions {
                 if (username != null) usernameField.sendKeys(username);
                 if (password != null) passwordField.sendKeys(password);
 
-                WebElement loginButton = driver.findElement(By.xpath("//button[contains(text(),'Log in')]"));
+                WebElement loginButton = wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//button[contains(text(),'Log in')]")));
                 loginButton.click();
             } catch (NoSuchElementException e) {
                 e.printStackTrace();
@@ -102,9 +105,6 @@ public class DemoblazeStepDefinitions {
 
     @Given("user is on the Demoblaze contact form page")
     public void userIsOnTheContactFormPage() {
-        if (driver == null) {
-            driver = new ChromeDriver();
-        }
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         formService = new DemoblazeTestService(driver);
         formService.openContactFormPage();
@@ -162,8 +162,6 @@ public class DemoblazeStepDefinitions {
 
     @Given("User is on the homepage")
     public void userIsOnTheHomepage() {
-        driver = new ChromeDriver();
-        searchAndNavigateService = new DemoblazeTestService(driver);
         searchAndNavigateService.openHomePage();
     }
 
