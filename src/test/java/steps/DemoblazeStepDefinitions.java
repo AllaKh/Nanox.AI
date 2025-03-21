@@ -4,18 +4,15 @@ import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import io.cucumber.java.Before;
 import java.util.Objects;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import service.UserCredentials;
 import service.DemoblazeTestService;
-import service.UserCredentials;
 
 import java.util.List;
 import java.util.Map;
@@ -23,18 +20,31 @@ import java.util.Map;
 public class DemoblazeStepDefinitions {
 
     WebDriver driver;
+    @Before
+    public void setUp() {
+        try {
+            driver = new ChromeDriver(); // Initialize WebDriver
+            demoblazeTestService = new DemoblazeTestService(driver);
+            demoblazeTestService.openLoginPage();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Assert.fail("Cannot initialize WebDriver: " + e.getMessage());
+        }
+    }
+
     DemoblazeTestService demoblazeTestService;
 
     @Given("User is on the login page")
     public void userIsOnTheLoginPage() {
-        driver = new ChromeDriver(); // Initialize WebDriver
-        demoblazeTestService = new DemoblazeTestService(driver);
-        demoblazeTestService.openLoginPage();
+        if (driver == null) {
+            driver = new ChromeDriver();
+        }
     }
 
     // ✅ Successful Login
     @When("User enters valid username {string} and password {string}")
     public void userEntersValidCredentials(String username, String password) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         demoblazeTestService.enterCredentials(username, password);
         demoblazeTestService.submitLogin();
     }
@@ -42,7 +52,6 @@ public class DemoblazeStepDefinitions {
     @Then("User should be redirected to the homepage")
     public void userShouldBeRedirectedToHomepage() {
         Assert.assertTrue("Login failed! User not redirected.", demoblazeTestService.isUserLoggedIn());
-        driver.quit();
     }
 
     // ❌ Unsuccessful Login
@@ -54,31 +63,38 @@ public class DemoblazeStepDefinitions {
             String username = row.get("username");
             String password = row.get("password");
 
-            WebElement usernameField = driver.findElement(By.id("loginusername"));
-            WebElement passwordField = driver.findElement(By.id("loginpassword"));
+            try {
+                WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+                WebElement usernameField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("loginusername")));
+                WebElement passwordField = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("loginpassword")));
 
-            usernameField.clear(); // Clear input field before entering values
-            passwordField.clear();
+                usernameField.clear(); // Clear field before entering new value
+                passwordField.clear();
 
-            if (username != null) usernameField.sendKeys(username);
-            if (password != null) passwordField.sendKeys(password);
+                if (username != null) usernameField.sendKeys(username);
+                if (password != null) passwordField.sendKeys(password);
 
-            WebElement loginButton = driver.findElement(By.xpath("//button[contains(text(),'Log in')]"));
-            loginButton.click();
+                WebElement loginButton = driver.findElement(By.xpath("//button[contains(text(),'Log in')]"));
+                loginButton.click();
+            } catch (NoSuchElementException e) {
+                e.printStackTrace();
+                Assert.fail("Element not found: " + e.getMessage());
+            } catch (Exception e) {
+                e.printStackTrace();
+                Assert.fail("An error occurred: " + e.getMessage());
+            }
         }
     }
 
     @Then("User should see an error message")
-    public void iShouldSeeAnErrorMessage() {
-        Assert Assert;
+    public void userShouldSeeAnErrorMessage() {
         try {
-            WebElement alert = driver.findElement(By.id("logInModal")); // Checking if modal still exists
+            WebElement alert = driver.findElement(By.id("logInModal")); // Проверка, что модальное окно все еще отображается
             Assert.assertTrue(alert.isDisplayed());
-            System.out.println("Error message displayed: Invalid credentials.");
+            System.out.println("Error message: Wrong credentials.");
         } catch (Exception e) {
-            Assert.fail("No error message displayed for invalid login.");
-        } finally {
-            driver.quit(); // Close browser after test
+            e.printStackTrace();
+            Assert.fail("Error message doesn't display for wrong enterance attempt: " + e.getMessage());
         }
     }
 
@@ -86,21 +102,33 @@ public class DemoblazeStepDefinitions {
 
     @Given("user is on the Demoblaze contact form page")
     public void userIsOnTheContactFormPage() {
-        driver = new ChromeDriver();
+        if (driver == null) {
+            driver = new ChromeDriver();
+        }
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         formService = new DemoblazeTestService(driver);
         formService.openContactFormPage();
     }
 
     // ✅ Successful Form Submission
     @When("user enters valid data in the form fields:")
-    public void userEntersValidData() {
-        UserCredentials userData = new UserCredentials(name, password, email, message);
-        formService.fillContactForm(userData);
+    public void userEntersValidData(DataTable dataTable) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
+        for (Map<String, String> row : data) {
+            String name = row.get("name");
+            String password = row.get("password");
+            String email = row.get("email");
+            String message = row.get("message");
+            UserCredentials userData = new UserCredentials(name, password, email, message);
+            formService.fillContactForm(userData);
+        }
     }
 
     // ❌ Unsuccessful Form Submission (using data table for different invalid inputs)
     @When("user enters invalid data in the form fields:")
     public void userEntersInvalidData(DataTable dataTable) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         List<Map<String, String>> credentialsList = dataTable.asMaps(String.class, String.class);
 
         for (Map<String, String> row : credentialsList) {
@@ -123,13 +151,11 @@ public class DemoblazeStepDefinitions {
     @Then("user should see a confirmation message")
     public void userShouldSeeAConfirmationMessage() {
         Assert.assertTrue("Confirmation message not displayed!", formService.isConfirmationMessageDisplayed());
-        driver.quit();
     }
 
     @Then("user should see an error message on form submission")
-    public void userShouldSeeAnErrorMessage() {
+    public void userShouldSeeAnErrorMessageOnFormSubmission() {
         Assert.assertTrue("Error message not displayed!", formService.isErrorMessageDisplayed());
-        driver.quit();
     }
 
     DemoblazeTestService searchAndNavigateService;
@@ -155,19 +181,16 @@ public class DemoblazeStepDefinitions {
     public void theSearchResultsShouldContain(String expectedProduct) {
         Assert.assertTrue("Search results do not contain expected product!",
                 searchAndNavigateService.isProductInSearchResults(expectedProduct));
-        driver.quit();
     }
 
     @Then("User should see a {string} message")
     public void userShouldSeeMessage(String expectedMessage) {
         Assert.assertEquals("Search message is incorrect!", expectedMessage, searchAndNavigateService.getNoResultsMessage());
-        driver.quit();
     }
 
     @Then("The system should display all available products")
     public void theSystemShouldDisplayAllAvailableProducts() {
         Assert.assertTrue("All products are not displayed!", searchAndNavigateService.isAllProductsDisplayed());
-        driver.quit();
     }
 
     @When("User clicks on each navigation link in the header")
@@ -185,7 +208,6 @@ public class DemoblazeStepDefinitions {
         // Explicitly declare the Map with String keys and String values
         Map<String, String> failedUrls = searchAndNavigateService.verifyNavigation();
         Assert.assertTrue("Some pages did not load correctly: " + failedUrls, failedUrls.isEmpty());
-        driver.quit();
     }
 
     @When("User clicks the logout button")
@@ -197,6 +219,12 @@ public class DemoblazeStepDefinitions {
     public void userShouldBeLoggedOutAndRedirectedToTheLoginPage() {
         boolean isLoggedOut = demoblazeTestService.verifyLogout();
         Assert.assertTrue("User is not logged out successfully", isLoggedOut);
-        driver.quit();
+    }
+
+    @After
+    public void tearDown() {
+        if (driver != null) {
+            driver.quit();
+        }
     }
 }
