@@ -1,29 +1,33 @@
 package service;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import java.time.Duration;
+import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class DemoblazeTestService {
-
-    private final WebDriver driver;
-
-    public DemoblazeTestService(WebDriver driver) {
-        this.driver = driver;
-        expectedFooterLinks = Map.of(
-                "Privacy Policy", "https://www.demoblaze.com/privacy.html",
-                "Terms & Conditions", "https://www.demoblaze.com/terms.html"
-        );
-    }
-
+    private WebDriver driver;
     private final String homePageUrl = "https://www.demoblaze.com/index.html";
     private final String loginPageUrl = "https://www.demoblaze.com/login.html";
     private final String contactPageUrl = "https://www.demoblaze.com/contact.html";
+
+    // Constructor that accepts a WebDriver
+    public DemoblazeTestService(WebDriver driver) {
+        WebDriverManager.chromedriver().setup();
+        this.driver = driver; // Set the WebDriver instance
+    }
 
     public String getPayload(String name, String password, String email, String message) throws JsonProcessingException {
         UserCredentials user = new UserCredentials(name, password, email, message);
@@ -32,8 +36,8 @@ public class DemoblazeTestService {
     }
 
     public void openLoginPage() {
-        driver.get(loginPageUrl); // Open site
-        driver.findElement(By.id("login2")).click(); // Click on login button
+        driver.get(loginPageUrl);
+        driver.findElement(By.id("login2")).click();
     }
 
     public void enterCredentials(String username, String password) {
@@ -93,22 +97,13 @@ public class DemoblazeTestService {
         }
     }
 
-    public boolean isErrorMessageDisplayedOnPage() {
-        try {
-            WebElement alert = driver.findElement(By.xpath("//div[contains(text(), 'Please fill out')]"));
-            return alert.isDisplayed();
-        } catch (NoSuchElementException e) {
-            return false;
-        }
-    }
-
     public void openHomePage() {
         driver.get(homePageUrl);
     }
 
     public void search(String query) {
-        WebElement searchField = driver.findElement(By.id("searchBox")); // Update with actual search field ID
-        WebElement searchButton = driver.findElement(By.id("searchBtn")); // Update with actual search button ID
+        WebElement searchField = driver.findElement(By.id("searchBox"));
+        WebElement searchButton = driver.findElement(By.id("searchBtn"));
 
         searchField.clear();
         searchField.sendKeys(query);
@@ -126,57 +121,29 @@ public class DemoblazeTestService {
     }
 
     public String getNoResultsMessage() {
-        WebElement noResultsElement = driver.findElement(By.id("noResultsMessage")); // Update with actual locator
+        WebElement noResultsElement = driver.findElement(By.id("noResultsMessage"));
         return noResultsElement.getText();
     }
 
     public boolean isAllProductsDisplayed() {
-        List<WebElement> allProducts = driver.findElements(By.cssSelector(".card-title a")); // Update locator
+        List<WebElement> allProducts = driver.findElements(By.cssSelector(".card-title a"));
         return !allProducts.isEmpty();
     }
 
-    private final Map<String, String> expectedHeaderLinks = Map.of(
-            "Home", "https://www.demoblaze.com/index.html",
-            "Contact", "https://www.demoblaze.com/contact.html",
-            "About Us", "https://www.demoblaze.com/about.html",
-            "Cart", "https://www.demoblaze.com/cart.html",
-            "Login", "https://www.demoblaze.com/login.html",
-            "Sign Up", "https://www.demoblaze.com/signup.html"
-    );
-
-    private final Map<String, String> expectedFooterLinks;
-
-    public void clickHeaderLinks() {
-        clickLinksAndVerify(expectedHeaderLinks, By.cssSelector(".nav-item a"));  // Update locator if necessary
-    }
-
-    public void clickFooterLinks() {
-        clickLinksAndVerify(expectedFooterLinks, By.cssSelector(".footer a"));  // Update locator if necessary
-    }
-
-    private void clickLinksAndVerify(Map<String, String> expectedLinks, By locator) {
-        List<WebElement> links = driver.findElements(locator);
-        for (WebElement link : links) {
-            String linkText = link.getText().trim();
-            if (expectedLinks.containsKey(linkText)) {
-                link.click();
-                String currentUrl = driver.getCurrentUrl();
-                if (!currentUrl.equals(expectedLinks.get(linkText))) {
-                    System.err.println("Mismatch for " + linkText + ": Expected " + expectedLinks.get(linkText) + ", but got " + currentUrl);
-                }
-                driver.navigate().back(); // Navigate back to homepage
+    public void clickLinksAndVerify(Map<String, String> expectedLinks) {
+        for (Map.Entry<String, String> entry : expectedLinks.entrySet()) {
+            By linkLocator = By.linkText(entry.getKey());
+            WebElement link = driver.findElement(linkLocator);
+            link.click();
+            String currentUrl = driver.getCurrentUrl();
+            if (!currentUrl.equals(entry.getValue())) {
+                System.out.println("Mismatch: Expected " + entry.getValue() + " but got " + currentUrl);
             }
+            driver.navigate().back();
         }
     }
 
-    public Map<String, String> verifyNavigation() {
-        Map<String, String> failedUrls = new HashMap<>();
-        verifyLink(expectedHeaderLinks, failedUrls);
-        verifyLink(expectedFooterLinks, failedUrls);
-        return failedUrls;
-    }
-
-    private void verifyLink(Map<String, String> expectedLinks, Map<String, String> failedUrls) {
+    public void verifyLink(Map<String, String> expectedLinks, Map<String, String> failedUrls) {
         for (Map.Entry<String, String> entry : expectedLinks.entrySet()) {
             driver.get(entry.getValue());
             String currentUrl = driver.getCurrentUrl();
@@ -192,10 +159,7 @@ public class DemoblazeTestService {
     }
 
     public boolean verifyLogout() {
-        // Wait for the login button to reappear
         waitForElement(By.id("login2"), 5);
-
-        // Check if we are redirected to the login page or login button is visible
         return driver.getCurrentUrl().equals(homePageUrl) &&
                 driver.findElement(By.id("login2")).isDisplayed();
     }

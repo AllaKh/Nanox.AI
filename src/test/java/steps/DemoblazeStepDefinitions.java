@@ -4,44 +4,61 @@ import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.java.Before;
-import java.util.Objects;
-import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import static org.openqa.selenium.support.ui.ExpectedConditions.urlContains;
+import java.time.Duration;
+import org.junit.Assert;
 import service.UserCredentials;
 import service.DemoblazeTestService;
-
+import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.ArrayList;
+import java.io.IOException;
+import io.cucumber.java.Before;
+import io.cucumber.java.After;
+import java.time.Clock;
 
 public class DemoblazeStepDefinitions {
 
-    WebDriver driver;
+    private WebDriver driver;
+    private DemoblazeTestService demoblazeTestService;
+    private Map<String, String> failedUrls = new ConcurrentHashMap<>();
+
     @Before
     public void setUp() {
         try {
             driver = new ChromeDriver(); // Initialize WebDriver
-            demoblazeTestService = new DemoblazeTestService(driver);
-            demoblazeTestService.openLoginPage();
+            demoblazeTestService = new DemoblazeTestService(driver); // Correctly call the constructor
+            demoblazeTestService.openLoginPage(); // Open the login page
         } catch (Exception e) {
             e.printStackTrace();
             Assert.fail("Cannot initialize WebDriver: " + e.getMessage());
         }
     }
 
-    DemoblazeTestService demoblazeTestService;
+//    DemoblazeTestService demoblazeTestService;
 
     @Given("User is on the login page")
     public void userIsOnTheLoginPage() {
         try {
-            driver.get("https://www.demoblaze.com/index.html")
+            driver.get("https://www.demoblaze.com/index.html");
             WebElement loginButton = driver.findElement(By.id("login2"));
             loginButton.click();
         } catch (Exception e) {
             e.printStackTrace();
+        }
     }
 
     // ✅ Successful Login
@@ -106,13 +123,12 @@ public class DemoblazeStepDefinitions {
     @Given("user is on the Demoblaze contact form page")
     public void userIsOnTheContactFormPage() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        formService = new DemoblazeTestService(driver);
         formService.openContactFormPage();
     }
 
     // ✅ Successful Form Submission
     @When("user enters valid data in the form fields:")
-    public void userEntersValidData(DataTable dataTable) {
+    public void userEntersValidData(DataTable dataTable) throws IOException {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         List<Map<String, String>> data = dataTable.asMaps(String.class, String.class);
         for (Map<String, String> row : data) {
@@ -127,7 +143,7 @@ public class DemoblazeStepDefinitions {
 
     // ❌ Unsuccessful Form Submission (using data table for different invalid inputs)
     @When("user enters invalid data in the form fields:")
-    public void userEntersInvalidData(DataTable dataTable) {
+    public void userEntersInvalidData(DataTable dataTable) throws IOException {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         List<Map<String, String>> credentialsList = dataTable.asMaps(String.class, String.class);
 
@@ -158,53 +174,64 @@ public class DemoblazeStepDefinitions {
         Assert.assertTrue("Error message not displayed!", formService.isErrorMessageDisplayed());
     }
 
-    DemoblazeTestService searchAndNavigateService;
-
     @Given("User is on the homepage")
     public void userIsOnTheHomepage() {
-        searchAndNavigateService.openHomePage();
+        demoblazeTestService.openHomePage();
     }
 
     @When("User searches for {string}")
     public void userSearchesFor(String query) {
-        searchAndNavigateService.search(query);
+        demoblazeTestService.search(query);
     }
 
     @When("User searches with an empty term")
     public void userSearchesWithAnEmptyTerm() {
-        searchAndNavigateService.search("");
+        demoblazeTestService.search("");
     }
 
     @Then("The search results should contain {string}")
     public void theSearchResultsShouldContain(String expectedProduct) {
         Assert.assertTrue("Search results do not contain expected product!",
-                searchAndNavigateService.isProductInSearchResults(expectedProduct));
+                demoblazeTestService.isProductInSearchResults(expectedProduct));
     }
 
     @Then("User should see a {string} message")
     public void userShouldSeeMessage(String expectedMessage) {
-        Assert.assertEquals("Search message is incorrect!", expectedMessage, searchAndNavigateService.getNoResultsMessage());
+        Assert.assertEquals("Search message is incorrect!", expectedMessage, demoblazeTestService.getNoResultsMessage());
     }
 
     @Then("The system should display all available products")
     public void theSystemShouldDisplayAllAvailableProducts() {
-        Assert.assertTrue("All products are not displayed!", searchAndNavigateService.isAllProductsDisplayed());
+        Assert.assertTrue("All products are not displayed!", demoblazeTestService.isAllProductsDisplayed());
     }
 
     @When("User clicks on each navigation link in the header")
     public void userClicksOnEachNavigationLinkInTheHeader() {
-        searchAndNavigateService.clickHeaderLinks();
-    }
+        Map<String, String> expectedLinks = new HashMap<>();
+        expectedLinks.put("Home", "https://www.demoblaze.com/index.html");
+        expectedLinks.put("Contact", "https://www.demoblaze.com/contact.html");
+        expectedLinks.put("About Us", "https://www.demoblaze.com/about.html");
+        expectedLinks.put("Cart", "https://www.demoblaze.com/cart.html");
+        expectedLinks.put("Login", "https://www.demoblaze.com/login.html");
+        expectedLinks.put("Sign Up", "https://www.demoblaze.com/signup.html");
 
-    @When("User clicks on each navigation link in the footer")
-    public void userClicksOnEachNavigationLinkInTheFooter() {
-        searchAndNavigateService.clickFooterLinks();
+//        testService.driver.get(demoblazeTestService.homePageUrl);
+        By homeLink = By.linkText("Home");
+        By contactLink = By.linkText("Contact");
+        By aboutUsLink = By.linkText("About us");
+        By cartLink = By.linkText("Cart");
+        By loginLink = By.linkText("Log in");
+        By signUpLink = By.linkText("Sign up");
+
+        // Use the service to click on links and verify URLs
+        demoblazeTestService.clickLinksAndVerify(expectedLinks);
     }
 
     @Then("The correct pages should load with the expected URLs")
-    public void theCorrectPagesShouldLoadWithTheExpectedURLs() {
-        if (!driver.getCurrentUrl().contains(expectedUrl)) {
-            failedUrls.put(entry.getKey(), driver.getCurrentUrl());
+    public void theCorrectPagesShouldLoadWithTheExpectedURLs() throws IOException {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        String expectedUrlFragment = "expected";
+        wait.until(urlContains(expectedUrlFragment));
     }
 
     @When("User clicks the logout button")
