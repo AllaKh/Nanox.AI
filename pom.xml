@@ -49,6 +49,7 @@
       <version>2.13.0</version> <!-- Use the latest version -->
     </dependency>
   </dependencies>
+
   <build>
     <finalName>Nanox.AI</finalName>
     <plugins>
