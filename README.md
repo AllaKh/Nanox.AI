@@ -10,7 +10,7 @@ This project implements automated UI tests for the Demo Blaze application using 
 
 Before running the tests, ensure you have the following installed:
 
-- **Java JDK 11+**
+- **Java JDK 22+**
 - **Maven**
 - **Git**
 - **Google Chrome** and **ChromeDriver** (ensure they are compatible versions)
@@ -39,8 +39,6 @@ To generate test reports:
 ```sh
 mvn verify
 ```
-
-
 
 ## Bug Reports
 
