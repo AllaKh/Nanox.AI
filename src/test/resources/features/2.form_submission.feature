@@ -20,4 +20,4 @@ Feature: Form submission functionality on Demoblaze
       |           | yz                |                 |
       | ""        | 567               |                 |
     And user submits the form
-    Then user should see an error message
+    Then user should see an error message on form submission

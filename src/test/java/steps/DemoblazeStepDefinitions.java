@@ -1,7 +1,6 @@
 package steps;
 
 import io.cucumber.datatable.DataTable;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -14,7 +13,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import service.Constants;
+import service.UserCredentials;
 import service.DemoblazeTestService;
 import service.UserCredentials;
 
@@ -95,7 +94,7 @@ public class DemoblazeStepDefinitions {
     // ✅ Successful Form Submission
     @When("user enters valid data in the form fields:")
     public void userEntersValidData() {
-        UserCredentials userData = new UserCredentials(Constants.USER_NAME, Constants.USER_PASSWORD, Constants.USER_EMAIL, Constants.USER_MESSAGE);
+        UserCredentials userData = new UserCredentials(name, password, email, message);
         formService.fillContactForm(userData);
     }
 
@@ -127,13 +126,14 @@ public class DemoblazeStepDefinitions {
         driver.quit();
     }
 
-    @Then("user should see an error message")
+    @Then("user should see an error message on form submission")
     public void userShouldSeeAnErrorMessage() {
         Assert.assertTrue("Error message not displayed!", formService.isErrorMessageDisplayed());
         driver.quit();
     }
 
     DemoblazeTestService searchAndNavigateService;
+
     @Given("User is on the homepage")
     public void userIsOnTheHomepage() {
         driver = new ChromeDriver();
@@ -187,6 +187,7 @@ public class DemoblazeStepDefinitions {
         Assert.assertTrue("Some pages did not load correctly: " + failedUrls, failedUrls.isEmpty());
         driver.quit();
     }
+
     @When("User clicks the logout button")
     public void userClicksTheLogoutButton() {
         demoblazeTestService.clickLogoutButton();
