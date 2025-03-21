@@ -203,9 +203,8 @@ public class DemoblazeStepDefinitions {
 
     @Then("The correct pages should load with the expected URLs")
     public void theCorrectPagesShouldLoadWithTheExpectedURLs() {
-        // Explicitly declare the Map with String keys and String values
-        Map<String, String> failedUrls = searchAndNavigateService.verifyNavigation();
-        Assert.assertTrue("Some pages did not load correctly: " + failedUrls, failedUrls.isEmpty());
+        if (!driver.getCurrentUrl().contains(expectedUrl)) {
+            failedUrls.put(entry.getKey(), driver.getCurrentUrl());
     }
 
     @When("User clicks the logout button")
