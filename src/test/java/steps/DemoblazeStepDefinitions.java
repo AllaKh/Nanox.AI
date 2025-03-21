@@ -48,8 +48,6 @@ public class DemoblazeStepDefinitions {
         }
     }
 
-//    DemoblazeTestService demoblazeTestService;
-
     @Given("User is on the login page")
     public void userIsOnTheLoginPage() {
         try {
@@ -215,7 +213,6 @@ public class DemoblazeStepDefinitions {
         expectedLinks.put("Login", "https://www.demoblaze.com/login.html");
         expectedLinks.put("Sign Up", "https://www.demoblaze.com/signup.html");
 
-//        testService.driver.get(demoblazeTestService.homePageUrl);
         By homeLink = By.linkText("Home");
         By contactLink = By.linkText("Contact");
         By aboutUsLink = By.linkText("About us");
