@@ -52,21 +52,15 @@ public class DemoblazeTestService {
     }
 
     public boolean isUserLoggedIn() {
-        try:
-            logout_button = driver.find_element(By.XPATH, "//a[text()='Log out']")
-            assert logout_button.is_displayed(), "Login failed: 'Log out' button not found."
-            print("Login successful!")
-        except AssertionError as e:
-            print(e)
-            print("Login failed.")
-        return true;
+        WebElement logoutButton = driver.findElement(By.id("logout2"));
+        return logoutButton.isDisplayed();
     }
 
     public boolean isErrorMessageDisplayed() {
         try {
-            WebElement alert = driver.findElement(By.id("logInModal")); // Check if modal is still open
+            WebElement alert = driver.findElement(By.id("logInModal"));
             return alert.isDisplayed();
-        } catch (Exception e) {
+        } catch (NoSuchElementException e) {
             return false;
         }
     }
